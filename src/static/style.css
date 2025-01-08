@@ -1,0 +1,108 @@
+/* 全体のレイアウト */
+body, html {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f4f4f9;
+}
+
+.container {
+  width: 90%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* タイトル */
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* カメラセクション */
+.camera-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+video, canvas {
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid #ccc;
+}
+
+#capture {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#capture:hover {
+  background-color: #0056b3;
+}
+
+/* プロンプトセクション */
+.prompt-section {
+  width: 100%;
+  display: none;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#promptInput {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* ボタングループ */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+#sendButton, #retryButton {
+  flex: 1;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#sendButton:hover, #retryButton:hover {
+  background-color: #0056b3;
+}
+
+#sendButton:disabled, 
+#retryButton:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+  border: 1px solid #aaaaaa;
+}
+
+/* 結果表示 */
+#result {
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  text-align: center;
+  width: 100%;
+  border-radius: 5px;
+}

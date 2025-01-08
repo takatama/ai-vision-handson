@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI画像解析ハンズオン</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>カメラ画像をAIで解析</h1>
+    <div class="camera-section">
+      <video id="video" autoplay playsinline></video>
+      <button id="capture">写真を撮影</button>
+      <canvas id="canvas" style="display:none;"></canvas>
+    </div>
+
+    <div id="promptSection" class="prompt-section">
+      <textarea id="promptInput" rows="4" placeholder="プロンプトを入力してください"></textarea>
+      <div class="button-group">
+        <button id="sendButton">AIで解析</button>
+        <button id="retryButton">撮り直し</button>
+      </div>
+      <div id="result"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
