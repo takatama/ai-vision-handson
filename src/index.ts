@@ -12,10 +12,10 @@ export default {
 			}
 			try {
 				// リクエストから画像データとプロンプトを取得
-				const requestData = await request.json() as { image: string; prompt: string };
-				const { image, prompt } = requestData;
+				const requestData = await request.json() as { image: string; prompt: string; model: string };
+				const { image, prompt, model } = requestData;
 
-				if (!image || !prompt) {
+				if (!image || !prompt || !model) {
 					return new Response("Invalid input: Image and prompt are required", {
 						status: 400,
 					});
@@ -34,11 +34,20 @@ export default {
 					max_tokens: 512,
 				};
 
+				// AIモデルを選択して実行
+				let modelPath: keyof AiModels;
+				if (model === "llava-hf") {
+					modelPath = "@cf/llava-hf/llava-1.5-7b-hf";
+				} else if (model === "unum") {
+					modelPath = "@cf/unum/uform-gen2-qwen-500m";
+				} else {
+					return new Response("Invalid model", {
+						status: 400,
+					});
+				}
+				
 				// AIモデルを実行
-				const response = await env.AI.run(
-					"@cf/llava-hf/llava-1.5-7b-hf",
-					input
-				);
+				const response = await env.AI.run(modelPath, input);
 
 				// AIの応答を返す
 				return new Response(JSON.stringify(response), {

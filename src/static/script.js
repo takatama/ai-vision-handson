@@ -6,6 +6,7 @@ const sendButton = document.getElementById('sendButton');
 const retryButton = document.getElementById('retryButton');
 const promptInput = document.getElementById('promptInput');
 const resultDiv = document.getElementById('result');
+const aiModelSelect = document.getElementById('aiModelSelect');
 
 const constraints = {
   video: {
@@ -41,7 +42,7 @@ retryButton.addEventListener('click', () => {
   canvas.style.display = 'none';
   promptSection.style.display = 'none';
   resultDiv.innerHTML = "";
-  promptInput.value = "";
+  // promptInput.value = "";
 
   video.style.display = 'block';
   captureButton.style.display = 'block';
@@ -51,9 +52,15 @@ retryButton.addEventListener('click', () => {
 sendButton.addEventListener('click', async () => {
   const imageData = canvas.toDataURL('image/png');
   const prompt = promptInput.value;
+  const model = aiModelSelect.value;
 
   if (!prompt) {
     alert('プロンプトを入力してください。');
+    return;
+  }
+
+  if (!model) {
+    alert('AIモデルを選択してください。');
     return;
   }
 
@@ -68,7 +75,7 @@ sendButton.addEventListener('click', async () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ image: imageData, prompt })
+      body: JSON.stringify({ image: imageData, prompt, model })
     });
 
     const result = await response.json();
