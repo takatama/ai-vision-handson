@@ -4,6 +4,56 @@ interface Env {
 	GEMINI_API_KEY: string;
 }
 
+async function handleWorkersAI(model: string, input: any, env: Env): Promise<Response> {
+	let modelPath: keyof AiModels;
+	if (model === "llava-hf") {
+			modelPath = "@cf/llava-hf/llava-1.5-7b-hf";
+	} else if (model === "unum") {
+			modelPath = "@cf/unum/uform-gen2-qwen-500m";
+	} else {
+			return new Response("Invalid model", { status: 400 });
+	}
+
+	const response = await env.AI.run(modelPath, input);
+	return new Response(JSON.stringify(response), {
+			headers: { "Content-Type": "application/json" },
+	});
+}
+
+async function handleGemini(base64Data: string, prompt: string, env: Env): Promise<Response> {
+	const geminiRequest = {
+			contents: {
+					role: "USER",
+					parts: [
+							{
+									inlineData: {
+											data: base64Data,
+											mimeType: "image/png"
+									}
+							},
+							{
+									text: prompt
+							}
+					]
+			}
+	};
+
+	const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`, {
+			method: "POST",
+			headers: {
+					"Content-Type": "application/json; charset=utf-8"
+			},
+			body: JSON.stringify(geminiRequest)
+	});
+
+	const geminiResult: any = await geminiResponse.json();
+	console.log(JSON.stringify(geminiResult, null, 2));
+	const description = geminiResult.candidates[0].content.parts[0].text;
+	return new Response(JSON.stringify({ description }), {
+			headers: { "Content-Type": "application/json" },
+	});
+}
+
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
 			const url = new URL(request.url);
@@ -36,51 +86,10 @@ export default {
 							};
 
 							// AIモデルを選択して実行
-							let modelPath: keyof AiModels;
-							if (model === "llava-hf") {
-									modelPath = "@cf/llava-hf/llava-1.5-7b-hf";
-									const response = await env.AI.run(modelPath, input);
-									return new Response(JSON.stringify(response), {
-											headers: { "Content-Type": "application/json" },
-									});
-							} else if (model === "unum") {
-									modelPath = "@cf/unum/uform-gen2-qwen-500m";
-									const response = await env.AI.run(modelPath, input);
-									return new Response(JSON.stringify(response), {
-											headers: { "Content-Type": "application/json" },
-									});
+							if (model === "llava-hf" || model === "unum") {
+									return await handleWorkersAI(model, input, env);
 							} else if (model === "gemini-1.5-flash") {
-									const geminiRequest = {
-											contents: {
-													role: "USER",
-													parts: [
-															{
-																	inlineData: {
-																			data: base64Data,
-																			mimeType: "image/png"
-																	}
-															},
-															{
-																	text: prompt
-															}
-													]
-											}
-									};
-
-									const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${env.GEMINI_API_KEY}`, {
-											method: "POST",
-											headers: {
-													"Content-Type": "application/json; charset=utf-8"
-											},
-											body: JSON.stringify(geminiRequest)
-									});
-
-									const geminiResult :any = await geminiResponse.json();
-									console.log(JSON.stringify(geminiResult, null, 2));
-									const description = geminiResult.candidates[0].content.parts[0].text;
-									return new Response(JSON.stringify({ description }), {
-											headers: { "Content-Type": "application/json" },
-									});
+									return await handleGemini(base64Data, prompt, env);
 							} else {
 									return new Response("Invalid model", {
 											status: 400,
